@@ -1,30 +1,28 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MessageCircle, X, Send, Trash2, BarChart3, MapPin, ChevronRight } from 'lucide-react';
 import styles from './Home.module.css';
-
-// Mock city data - you can replace with your actual cities
-const cities = [
-  'New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia',
-  'San Antonio', 'San Diego', 'Dallas', 'San Jose', 'Austin', 'Jacksonville',
-  'Fort Worth', 'Columbus', 'Charlotte', 'San Francisco', 'Indianapolis',
-  'Seattle', 'Denver', 'Washington DC', 'Boston', 'El Paso', 'Nashville',
-  'Detroit', 'Oklahoma City', 'Portland', 'Las Vegas', 'Memphis', 'Louisville',
-  'Baltimore', 'Milwaukee', 'Albuquerque', 'Tucson', 'Fresno', 'Mesa',
-  'Sacramento', 'Atlanta', 'Kansas City', 'Colorado Springs', 'Omaha'
-];
+import { fetchCities } from '../../api/home/citiesapi';
 
 const Home = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [cities, setCities] = useState([]);
+  const [error, setError] = useState(null);
   const [chatMessage, setChatMessage] = useState('');
   const [chatMessages, setChatMessages] = useState([
     { type: 'bot', message: 'Hello! I\'m your Waste Management AI assistant. How can I help you today?' }
   ]);
 
-  const handleCityClick = (city) => {
+  useEffect(() => {
+    fetchCities()
+      .then((data) => setCities(data))
+      .catch((err) => setError(err.message));
+  }, []);
+
+  const handleCityClick = (cityObj) => {
     // Navigate to city dashboard - replace with your actual navigation
-    console.log(`Navigating to ${city} dashboard`);
-    // Example: navigate(`/dashboard/${city.toLowerCase().replace(/\s+/g, '-')}`);
-    alert(`Navigating to ${city} waste management dashboard...`);
+    console.log(`Navigating to ${cityObj.city} dashboard`);
+    // Example: navigate(`/dashboard/${cityObj.city.toLowerCase().replace(/\s+/g, '-')}`);
+    alert(`Navigating to ${cityObj.city} waste management dashboard...`);
   };
 
   const handleSendMessage = () => {
@@ -53,7 +51,7 @@ const Home = () => {
             <Trash2 className={styles.logoIcon} />
             <div>
               <h1 className={styles.title}>WasteManager AI</h1>
-              <span className={styles.subtitle}>Report Analyzer System</span>
+              <p className={styles.subtitle}>Smart Waste Management Solutions</p>
             </div>
           </div>
         </div>
@@ -70,16 +68,16 @@ const Home = () => {
 
         {/* City Grid */}
         <div className={styles.cityGrid}>
-          {cities.map((city, index) => (
+          {cities.map((cityObj) => (
             <div 
-              key={index}
+              key={cityObj.id}
               className={styles.cityCard}
-              onClick={() => handleCityClick(city)}
+              onClick={() => handleCityClick(cityObj)}
             >
               <div className={styles.cityIcon}>
                 <MapPin />
               </div>
-              <span className={styles.cityName}>{city}</span>
+              <span className={styles.cityName}>{cityObj.city}</span>
               <ChevronRight className={styles.cityArrow} />
             </div>
           ))}
