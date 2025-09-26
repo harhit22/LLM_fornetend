@@ -1,11 +1,30 @@
-
-import Home from './pages/home/Home';
-
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { CityProvider } from "./context/CityContext";
+import Home from "./pages/home/Home";
+import Report from "./pages/report/Report";
+import TripValidationReport from "./components/tripValidationReport/TripValidationReport ";
+import DriverTripSummary from "./components/driverTripSummery/DriverTripSummary ";
+import FuelValidationReport from "./components/fuelValidationReport/FuelValidationReport"
+import SkiplineValidationReport from "./components/skiplineValidationReport/SkiplineValidationReport";
+import { DateProvider } from "./context/DateContext";
 function App() {
   return (
-  <div>
-    <Home />
-  </div>
+    <CityProvider>
+      <DateProvider>
+        <Router>
+          <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/report" element={<Report />} />
+          <Route path="/trip-validation-report" element={<TripValidationReport />} />
+            <Route path="/driver-trip-summary" element={<DriverTripSummary />} />
+            <Route path="/fuel-validation-report" element={<FuelValidationReport />} />
+            <Route path="/skipline-validation-report" element={<SkiplineValidationReport />} />
+          
+        </Routes>
+      </Router>
+    </DateProvider>
+    </CityProvider>
   );
 }
 

@@ -1,0 +1,479 @@
+/* DriverTripSummary.module.css */
+
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 50%, #f0fdf4 100%);
+  padding: 1rem;
+}
+
+.mainWrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Header Styles */
+.headerCard {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border: 1px solid #dcfce7;
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.headerIcon {
+  background: linear-gradient(135deg, #4ade80, #22c55e);
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.headerTitle {
+  font-size: 1.875rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0;
+}
+
+.headerSubtitle {
+  color: #6b7280;
+  margin-top: 0.25rem;
+  margin-bottom: 0;
+}
+
+/* Filters Card */
+.filtersCard {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border: 1px solid #dcfce7;
+}
+
+.filtersGrid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .filtersGrid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+.dateGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.dateLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.dateInput {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #bbf7d0;
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.7);
+  transition: all 0.2s ease;
+}
+
+.dateInput:focus {
+  outline: none;
+  ring: 2px solid #4ade80;
+  border-color: #4ade80;
+}
+
+.buttonsGroup {
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  gap: 0.75rem;
+}
+
+.todayButton {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  background: #dcfce7;
+  color: #15803d;
+  border-radius: 0.5rem;
+  border: 1px solid #bbf7d0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.todayButton:hover {
+  background: #bbf7d0;
+}
+
+.generateButton {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: white;
+  border-radius: 0.75rem;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.generateButton:hover {
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.generateButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.loadingContent {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Loading State */
+.loadingCard {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  padding: 3rem;
+  text-align: center;
+  border: 1px solid #dcfce7;
+}
+
+.loadingContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.spinner {
+  width: 3rem;
+  height: 3rem;
+  border: 4px solid #bbf7d0;
+  border-top: 4px solid #16a34a;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loadingText {
+  color: #6b7280;
+  font-weight: 500;
+  margin: 0;
+}
+
+.smallSpinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid white;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Error State */
+.errorCard {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.errorContent {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.errorText {
+  color: #b91c1c;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Results Table */
+.resultsCard {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #dcfce7;
+  overflow: hidden;
+}
+
+.tableHeader {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: white;
+}
+
+.tableTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.tableSubtitle {
+  color: #bbf7d0;
+  margin-top: 0.25rem;
+  margin-bottom: 0;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tableHead {
+  background: #f0fdf4;
+}
+
+.tableHeadCell {
+  padding: 1rem 1.5rem;
+  text-align: left;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.tableHeadCellCenter {
+  padding: 1rem 1.5rem;
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.tableBody {
+  background: white;
+}
+
+.tableRow {
+  border-top: 1px solid #dcfce7;
+  transition: all 0.2s ease;
+}
+
+.tableRow:hover {
+  background: rgba(240, 253, 244, 0.5);
+}
+
+.tableRowEven {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.tableRowOdd {
+  background: rgba(240, 253, 244, 0.3);
+}
+
+.tableCell {
+  padding: 1rem 1.5rem;
+}
+
+.tableCellCenter {
+  padding: 1rem 1.5rem;
+  text-align: center;
+}
+
+.driverInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.driverAvatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  background: linear-gradient(135deg, #4ade80, #22c55e);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+}
+
+.driverName {
+  font-weight: 500;
+  color: #111827;
+}
+
+.phoneInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.phoneNumber {
+  color: #374151;
+  font-family: 'Courier New', monospace;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.statusBadgeGreen {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.statusBadgeYellow {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.statusBadgeRed {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.callButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #22c55e;
+  color: white;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.callButton:hover {
+  background: #16a34a;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Empty State */
+.emptyCard {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  padding: 3rem;
+  text-align: center;
+  border: 1px solid #dcfce7;
+}
+
+.emptyContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.emptyIcon {
+  width: 4rem;
+  height: 4rem;
+  background: #dcfce7;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emptyTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 0.5rem 0;
+}
+
+.emptyText {
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 0.5rem;
+  }
+  
+  .headerCard {
+    padding: 1.5rem;
+  }
+  
+  .headerTitle {
+    font-size: 1.5rem;
+  }
+  
+  .filtersCard {
+    padding: 1rem;
+  }
+  
+  .filtersGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .buttonsGroup {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  
+  .tableHeader {
+    padding: 1rem;
+  }
+  
+  .tableHeadCell,
+  .tableHeadCellCenter,
+  .tableCell,
+  .tableCellCenter {
+    padding: 0.75rem 1rem;
+  }
+  
+  .driverInfo {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .phoneInfo {
+    font-size: 0.875rem;
+  }
+}

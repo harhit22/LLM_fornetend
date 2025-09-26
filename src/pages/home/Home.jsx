@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { MessageCircle, X, Send, Trash2, BarChart3, MapPin, ChevronRight } from 'lucide-react';
 import styles from './Home.module.css';
 import { fetchCities } from '../../api/home/citiesapi';
+import { useCity } from "../../context/CityContext";
+import { useNavigate } from "react-router-dom"; 
 
 const Home = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -11,7 +13,8 @@ const Home = () => {
   const [chatMessages, setChatMessages] = useState([
     { type: 'bot', message: 'Hello! I\'m your Waste Management AI assistant. How can I help you today?' }
   ]);
-
+  const { selectedCity, setSelectedCity } = useCity();  
+  const navigate = useNavigate();  
   useEffect(() => {
     fetchCities()
       .then((data) => setCities(data))
@@ -19,10 +22,8 @@ const Home = () => {
   }, []);
 
   const handleCityClick = (cityObj) => {
-    // Navigate to city dashboard - replace with your actual navigation
-    console.log(`Navigating to ${cityObj.city} dashboard`);
-    // Example: navigate(`/dashboard/${cityObj.city.toLowerCase().replace(/\s+/g, '-')}`);
-    alert(`Navigating to ${cityObj.city} waste management dashboard...`);
+    setSelectedCity(cityObj);
+    navigate("/report");   
   };
 
   const handleSendMessage = () => {
