@@ -7,6 +7,7 @@ import TripValidationReport from "./components/tripValidationReport/TripValidati
 import DriverTripSummary from "./components/driverTripSummery/DriverTripSummary ";
 import FuelValidationReport from "./components/fuelValidationReport/FuelValidationReport"
 import SkiplineValidationReport from "./components/skiplineValidationReport/SkiplineValidationReport";
+import TransportExecutiveLoginValidation from "./components/TransportExecutiveLoginValidation/TransportExecutiveLoginValidation";
 import { DateProvider } from "./context/DateContext";
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
             <Route path="/driver-trip-summary" element={<DriverTripSummary />} />
             <Route path="/fuel-validation-report" element={<FuelValidationReport />} />
             <Route path="/skipline-validation-report" element={<SkiplineValidationReport />} />
+            <Route path="/transport-executive-login-validation" element={<TransportExecutiveLoginValidation />} />
           
         </Routes>
       </Router>
