@@ -68,7 +68,7 @@ const TripValidationReport = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        "http://127.0.0.1:8000/mobile-api/trip-validation-reports/"
+        `${BASE_URL}/mobile-api/mobile-api/trip-validation-reports/`
       );
       const data = await response.json();
       setReports(data.reports || []);

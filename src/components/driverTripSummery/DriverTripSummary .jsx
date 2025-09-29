@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AlertTriangle, Calendar, User, Truck, Phone } from 'lucide-react';
 import styles from './DriverTripSummary.module.css';
 import { useCity } from "../../context/CityContext";
-
+import BASE_URL from '../../api/constent/BaseUrl';
 const DriverTripSummary = () => {
     const { selectedCity } = useCity();
   const [reportData, setReportData] = useState([]);
@@ -30,7 +30,7 @@ const DriverTripSummary = () => {
     }
 
     // Replace this with your actual API call
-    const url = new URL('http://127.0.0.1:8000/mobile-api/driver-trip-summary/');
+    const url = new URL(`${BASE_URL}/mobile-api/driver-trip-summary/`);
     url.searchParams.append('start_date', startDate);
     if (endDate) {
       url.searchParams.append('end_date', endDate);

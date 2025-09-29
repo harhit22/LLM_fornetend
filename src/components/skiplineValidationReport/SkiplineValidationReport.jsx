@@ -74,7 +74,7 @@ const SkiplineValidationReport = () => {
       if (showRepeatedOnly) params.set("only_repeated", "true");
       
       const queryString = params.toString();
-      const url = `http://127.0.0.1:8000/mobile-api/skipline-validation-reports/${queryString ? '?' + queryString : ''}`;
+      const url = `${BASE_URL}/mobile-api/mobile-api/skipline-validation-reports/${queryString ? '?' + queryString : ''}`;
       
       const response = await fetch(url);
       const data = await response.json();

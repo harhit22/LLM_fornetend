@@ -15,8 +15,8 @@ const Report = () => {
   const fetchReportTypes = async () => {
     try {
       setLoading(true);
-      
-      const response = await fetch('http://127.0.0.1:8000/mobile-api/reports/');
+
+      const response = await fetch(`${BASE_URL}/mobile-api/mobile-api/reports/`);
       const data = await response.json();
       
       if (data.success) {
