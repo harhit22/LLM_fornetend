@@ -14,6 +14,7 @@ import {
 import { useCity } from "../../context/CityContext";
 import styles from "./TripValidationReport.module.css";
 import { Navigate } from "react-router-dom";
+import BASE_URL from '../../api/constent/BaseUrl';
 
 const TripValidationReport = () => {
   const { selectedCity } = useCity();
@@ -42,7 +43,7 @@ const TripValidationReport = () => {
   });
   const location = useLocation();
 
-  useEffect(() => {
+    useEffect(() => {
     fetchTripReports();
   }, []);
 
@@ -60,17 +61,35 @@ const TripValidationReport = () => {
     }
   }, [location.search]);
 
+  // Fetch reports when date filter changes
+  useEffect(() => {
+    if (dateFilter) {
+      fetchTripReports(dateFilter);
+    }
+  }, [dateFilter]);
+
   useEffect(() => {
     applyFilters();
-  }, [reports, dateFilter, driverFilter, showOnlyIncorrect, selectedCity]);
+  }, [reports, driverFilter, showOnlyIncorrect, selectedCity]);
 
-  const fetchTripReports = async () => {
+  const fetchTripReports = async (date = null) => {
     try {
       setLoading(true);
-      const response = await fetch(
-        `${BASE_URL}/mobile-api/mobile-api/trip-validation-reports/`
-      );
+      let url = `${BASE_URL}/mobile-api/trip-validation-reports/`;
+      
+      // Add date parameter if provided
+      if (date) {
+        url += `?date=${date}`;
+      }
+
+      if(selectedCity && selectedCity.city){
+        const cityParam = date ? `&city=${selectedCity.city}` : `?city=${selectedCity.city}`;
+        url += cityParam;
+      }
+      
+      const response = await fetch(url);
       const data = await response.json();
+      console.log("Fetched trip reports:", data);
       setReports(data.reports || []);
       calculateStats(data.reports || []);
     } catch (err) {
@@ -113,9 +132,8 @@ const TripValidationReport = () => {
   const applyFilters = () => {
     let filtered = [...reports];
 
-    if (dateFilter) {
-      filtered = filtered.filter((report) => report.date === dateFilter);
-    }
+    // Don't filter by date here since it's already filtered by the API
+    // The dateFilter is sent to the backend in fetchTripReports
 
     if (driverFilter) {
       filtered = filtered.filter((report) =>
@@ -123,11 +141,8 @@ const TripValidationReport = () => {
       );
     }
 
-    if (selectedCity && selectedCity.city) {
-      filtered = filtered.filter((report) =>
-        report.site_name.toLowerCase().includes(selectedCity.city.toLowerCase())
-      );
-    }
+    // Don't filter by city here since it's already filtered by the API
+    // The selectedCity is sent to the backend in fetchTripReports
 
     if (showOnlyIncorrect) {
       filtered = filtered.filter(

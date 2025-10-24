@@ -1,6 +1,7 @@
+import BASE_URL from "../constent/BaseUrl";
 export async function fetchCities() {
   try {
-    const response = await fetch(`${BASE_URL}/mobile-api/mobile-api/cities`);
+    const response = await fetch(`${BASE_URL}/mobile-api/cities`);
 
     if (!response.ok) {
       throw new Error("Failed to fetch cities");

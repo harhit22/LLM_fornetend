@@ -9,6 +9,7 @@ import FuelValidationReport from "./components/fuelValidationReport/FuelValidati
 import SkiplineValidationReport from "./components/skiplineValidationReport/SkiplineValidationReport";
 import TransportExecutiveLoginValidation from "./components/TransportExecutiveLoginValidation/TransportExecutiveLoginValidation";
 import { DateProvider } from "./context/DateContext";
+import DutyOnOffReport from "./components/dutyonoffvalidation/DutyOnOffReport";
 function App() {
   return (
     <CityProvider>
@@ -22,6 +23,7 @@ function App() {
             <Route path="/fuel-validation-report" element={<FuelValidationReport />} />
             <Route path="/skipline-validation-report" element={<SkiplineValidationReport />} />
             <Route path="/transport-executive-login-validation" element={<TransportExecutiveLoginValidation />} />
+            <Route path="/DutyOnOffReport" element={<DutyOnOffReport />} />
           
         </Routes>
       </Router>

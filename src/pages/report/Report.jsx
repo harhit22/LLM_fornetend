@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styles from './Report.module.css';
 import { useNavigate } from "react-router-dom"; 
-
+import BASE_URL from '../../api/constent/BaseUrl';
 const Report = () => {
   const [reportTypes, setReportTypes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,12 +16,13 @@ const Report = () => {
     try {
       setLoading(true);
 
-      const response = await fetch(`${BASE_URL}/mobile-api/mobile-api/reports/`);
+      const response = await fetch(`${BASE_URL}/mobile-api/reports/`);
       const data = await response.json();
+      
       
       if (data.success) {
         setReportTypes(data.report_types);
-        console.log('Fetched report types:', data.report_types);
+       
       } else {
         throw new Error(data.error || 'Failed to fetch reports');
       }
@@ -44,7 +45,11 @@ const Report = () => {
       case 'skip lines report':
         return '/skipline-validation-report';
       case 'employee sop report':
-        return '/sop-te-report';
+        return '/transport-executive-login-validation';
+        case 'employee sop report':
+        return '/transport-executive-login-validation';
+      case 'duty on off report':
+        return '/DutyOnOffReport';
       default:
         return '/details'; // fallback route
     }

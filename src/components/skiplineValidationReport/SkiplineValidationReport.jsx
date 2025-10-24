@@ -22,11 +22,16 @@ import {
   Fuel,
   FileText,
   Menu,
-  X
+  X,
+  Brain,
+  Shield,
+  AlertCircle,
+  TrendingUp
 } from "lucide-react";
 import { useCity } from "../../context/CityContext";
 import styles from "./SkiplineValidationReport.module.css";
 import { useDate } from "../../context/DateContext";
+import BASE_URL from '../../api/constent/BaseUrl';
 
 const SkiplineValidationReport = () => {
   const { selectedCity, setSelectedCity } = useCity();
@@ -44,9 +49,16 @@ const SkiplineValidationReport = () => {
   const [statusFilter, setStatusFilter] = useState("");
   const [driverFilter, setDriverFilter] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+  
+  // NEW AI FILTERS
+  const [aiVerdictFilter, setAiVerdictFilter] = useState("");
+  const [aiConfidenceFilter, setAiConfidenceFilter] = useState("");
+  const [showFraudulentOnly, setShowFraudulentOnly] = useState(false);
+  const [showManualReviewOnly, setShowManualReviewOnly] = useState(false);
+  
   const navigate = useNavigate();
 
-  // Stats
+  // Stats including AI
   const [stats, setStats] = useState({
     total: 0,
     completed: 0,
@@ -55,6 +67,13 @@ const SkiplineValidationReport = () => {
     repeated: 0,
     completionRate: 0,
     skipRate: 0,
+    ai_analysis: {
+      total_analyzed: 0,
+      fraudulent_skips: 0,
+      legitimate_skips: 0,
+      needs_review: 0,
+      fraud_rate: 0
+    }
   });
 
   const location = useLocation();
@@ -63,18 +82,24 @@ const SkiplineValidationReport = () => {
     try {
       setLoading(true);
       
-      // Build API URL with filters
+      // Build API URL with filters including AI filters
       const params = new URLSearchParams();
       if (dateFilter) params.set("date", dateFilter);
       if (selectedCity?.city) params.set("city", selectedCity.city);
       if (wardFilter) params.set("ward", wardFilter);
       if (statusFilter) params.set("status", statusFilter);
       if (driverFilter) params.set("driver", driverFilter);
-      if (showOnlySkipped) params.set("only_skipped", "true");
-      if (showRepeatedOnly) params.set("only_repeated", "true");
+      if (showOnlySkipped) params.set("show_only_skipped", "true");
+      if (showRepeatedOnly) params.set("show_only_repeated", "true");
+      
+      // AI filters
+      if (aiVerdictFilter) params.set("ai_verdict", aiVerdictFilter);
+      if (aiConfidenceFilter) params.set("ai_confidence", aiConfidenceFilter);
+      if (showFraudulentOnly) params.set("show_fraudulent_only", "true");
+      if (showManualReviewOnly) params.set("show_manual_review_only", "true");
       
       const queryString = params.toString();
-      const url = `${BASE_URL}/mobile-api/mobile-api/skipline-validation-reports/${queryString ? '?' + queryString : ''}`;
+      const url = `${BASE_URL}/mobile-api/skipline-validation-reports/${queryString ? '?' + queryString : ''}`;
       
       const response = await fetch(url);
       const data = await response.json();
@@ -90,7 +115,11 @@ const SkiplineValidationReport = () => {
 
   useEffect(() => {
     fetchSkiplineReports();
-  }, [dateFilter, selectedCity, wardFilter, statusFilter, driverFilter, showOnlySkipped, showRepeatedOnly]);
+  }, [
+    dateFilter, selectedCity, wardFilter, statusFilter, driverFilter, 
+    showOnlySkipped, showRepeatedOnly,
+    aiVerdictFilter, aiConfidenceFilter, showFraudulentOnly, showManualReviewOnly
+  ]);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -146,6 +175,10 @@ const SkiplineValidationReport = () => {
     setDriverFilter("");
     setShowOnlySkipped(false);
     setShowRepeatedOnly(false);
+    setAiVerdictFilter("");
+    setAiConfidenceFilter("");
+    setShowFraudulentOnly(false);
+    setShowManualReviewOnly(false);
   };
 
   const getStatusIcon = (status) => {
@@ -172,6 +205,54 @@ const SkiplineValidationReport = () => {
       default:
         return styles.statusDefault;
     }
+  };
+
+  const getAiAlertBadge = (aiValidation) => {
+    if (!aiValidation || !aiValidation.verdict) return null;
+
+    const { alert_level, analysis_category } = aiValidation;
+
+    if (analysis_category === 'FRAUDULENT_SKIP') {
+      return (
+        <div className={styles.aiBadgeCritical}>
+          <AlertCircle size={14} />
+          <span>🚨 FRAUDULENT</span>
+        </div>
+      );
+    }
+
+    if (analysis_category === 'LEGITIMATE_SKIP') {
+      return (
+        <div className={styles.aiBadgeSuccess}>
+          <Shield size={14} />
+          <span>✅ VERIFIED</span>
+        </div>
+      );
+    }
+
+    if (analysis_category === 'NEEDS_REVIEW') {
+      return (
+        <div className={styles.aiBadgeWarning}>
+          <Eye size={14} />
+          <span>⚠️ REVIEW</span>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
+  const getConfidenceBadge = (confidence) => {
+    if (!confidence) return null;
+
+    const badges = {
+      'HIGH': <span className={styles.confidenceHigh}>High Confidence</span>,
+      'MODERATE': <span className={styles.confidenceModerate}>Moderate</span>,
+      'LOW': <span className={styles.confidenceLow}>Low Confidence</span>,
+      'VERY_LOW': <span className={styles.confidenceVeryLow}>Very Low</span>,
+    };
+
+    return badges[confidence] || null;
   };
 
   if (loading) {
@@ -316,6 +397,51 @@ const SkiplineValidationReport = () => {
         )}
       </div>
 
+      {/* AI Statistics Summary Banner */}
+      {stats.ai_analysis && stats.ai_analysis.total_analyzed > 0 && (
+        <div className={styles.aiStatsBanner}>
+          <div className={styles.aiStatsHeader}>
+            <Brain size={20} />
+            <h3>AI Analysis Summary</h3>
+          </div>
+          <div className={styles.aiStatsGrid}>
+            <div className={styles.aiStatItem}>
+              <TrendingUp size={16} />
+              <span className={styles.aiStatValue}>{stats.ai_analysis.total_analyzed}</span>
+              <span className={styles.aiStatLabel}>Analyzed</span>
+            </div>
+            <div className={styles.aiStatItem} style={{borderLeft: '3px solid #ef4444'}}>
+              <AlertCircle size={16} color="#ef4444" />
+              <span className={styles.aiStatValue} style={{color: '#ef4444'}}>
+                {stats.ai_analysis.fraudulent_skips}
+              </span>
+              <span className={styles.aiStatLabel}>Fraudulent</span>
+            </div>
+            <div className={styles.aiStatItem} style={{borderLeft: '3px solid #22c55e'}}>
+              <Shield size={16} color="#22c55e" />
+              <span className={styles.aiStatValue} style={{color: '#22c55e'}}>
+                {stats.ai_analysis.legitimate_skips}
+              </span>
+              <span className={styles.aiStatLabel}>Legitimate</span>
+            </div>
+            <div className={styles.aiStatItem} style={{borderLeft: '3px solid #f59e0b'}}>
+              <Eye size={16} color="#f59e0b" />
+              <span className={styles.aiStatValue} style={{color: '#f59e0b'}}>
+                {stats.ai_analysis.needs_review}
+              </span>
+              <span className={styles.aiStatLabel}>Need Review</span>
+            </div>
+            <div className={styles.aiStatItem} style={{borderLeft: '3px solid #8b5cf6'}}>
+              <BarChart3 size={16} color="#8b5cf6" />
+              <span className={styles.aiStatValue} style={{color: '#8b5cf6'}}>
+                {stats.ai_analysis.fraud_rate}%
+              </span>
+              <span className={styles.aiStatLabel}>Fraud Rate</span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Filters */}
       {showFilters && (
         <div className={styles.filtersSection}>
@@ -333,24 +459,93 @@ const SkiplineValidationReport = () => {
                   className={styles.filterInput}
                 />
               </div>
+              
               <div className={styles.filterGroup}>
                 <label className={styles.filterLabel}>
                   <MapPin size={16} />
-                  Site Name
+                  Ward
                 </label>
                 <input
                   type="text"
-                  placeholder="Enter site name"
-                  // value={siteFilter}
-                  // onChange={handleSiteChange}
+                  placeholder="Enter ward key"
+                  value={wardFilter}
+                  onChange={(e) => setWardFilter(e.target.value)}
                   className={styles.filterInput}
                 />
+              </div>
+
+              <div className={styles.filterGroup}>
+                <label className={styles.filterLabel}>
+                  <User size={16} />
+                  Status
+                </label>
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className={styles.filterInput}
+                >
+                  <option value="">All Status</option>
+                  <option value="Skipped">Skipped</option>
+                  <option value="LineCompleted">Completed</option>
+                  <option value="Unknown">Unknown</option>
+                </select>
+              </div>
+
+              <div className={styles.filterGroup}>
+                <label className={styles.filterLabel}>
+                  <User size={16} />
+                  Driver
+                </label>
+                <input
+                  type="text"
+                  placeholder="Name or mobile"
+                  value={driverFilter}
+                  onChange={(e) => setDriverFilter(e.target.value)}
+                  className={styles.filterInput}
+                />
+              </div>
+
+              {/* AI FILTERS */}
+              <div className={styles.filterGroup}>
+                <label className={styles.filterLabel}>
+                  <Brain size={16} />
+                  AI Verdict
+                </label>
+                <select
+                  value={aiVerdictFilter}
+                  onChange={(e) => setAiVerdictFilter(e.target.value)}
+                  className={styles.filterInput}
+                >
+                  <option value="">All Verdicts</option>
+                  <option value="NOT_PASSABLE">Not Passable</option>
+                  <option value="PASSABLE">Passable</option>
+                  <option value="LIKELY_NOT_PASSABLE">Likely Not Passable</option>
+                  <option value="LIKELY_PASSABLE">Likely Passable</option>
+                  <option value="UNCERTAIN">Uncertain</option>
+                </select>
+              </div>
+
+              <div className={styles.filterGroup}>
+                <label className={styles.filterLabel}>
+                  <TrendingUp size={16} />
+                  AI Confidence
+                </label>
+                <select
+                  value={aiConfidenceFilter}
+                  onChange={(e) => setAiConfidenceFilter(e.target.value)}
+                  className={styles.filterInput}
+                >
+                  <option value="">All Confidence</option>
+                  <option value="HIGH">High</option>
+                  <option value="MODERATE">Moderate</option>
+                  <option value="LOW">Low</option>
+                  <option value="VERY_LOW">Very Low</option>
+                </select>
               </div>
             </div>
 
             <div className={styles.filtersBottom}>
               <div className={styles.checkboxGroup}>
-                
                 <label className={styles.checkboxLabel}>
                   <input
                     type="checkbox"
@@ -359,6 +554,26 @@ const SkiplineValidationReport = () => {
                     className={styles.checkbox}
                   />
                   <span>Show only repeated lines</span>
+                </label>
+
+                <label className={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    checked={showFraudulentOnly}
+                    onChange={(e) => setShowFraudulentOnly(e.target.checked)}
+                    className={styles.checkbox}
+                  />
+                  <span>🚨 Show fraudulent only</span>
+                </label>
+
+                <label className={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    checked={showManualReviewOnly}
+                    onChange={(e) => setShowManualReviewOnly(e.target.checked)}
+                    className={styles.checkbox}
+                  />
+                  <span>⚠️ Show manual review needed</span>
                 </label>
               </div>
 
@@ -383,12 +598,15 @@ const SkiplineValidationReport = () => {
               const isSkipped = report.status === "Skipped";
               const isRepeated = report.repeated;
               const hasIssue = isSkipped || report.status === "Unknown";
+              const aiValidation = report.ai_validation;
 
               return (
                 <div
                   key={index}
                   className={`${styles.reportCard} ${getStatusClass(report.status)} ${
                     isRepeated ? styles.reportCardRepeated : ""
+                  } ${
+                    aiValidation?.analysis_category === 'FRAUDULENT_SKIP' ? styles.reportCardFraudulent : ""
                   }`}
                 >
                   <div className={styles.reportHeader}>
@@ -403,6 +621,7 @@ const SkiplineValidationReport = () => {
                               Repeated
                             </span>
                           )}
+                          {getAiAlertBadge(aiValidation)}
                         </div>
                         <p className={styles.reportSubtitle}>
                           <MapPin size={14} />
@@ -435,6 +654,29 @@ const SkiplineValidationReport = () => {
                         </div>
                       </div>
                     </div>
+
+                    {/* AI Analysis Section */}
+                    {aiValidation && aiValidation.verdict && (
+                      <div className={`${styles.aiAnalysisSection} ${
+                        aiValidation.analysis_category === 'FRAUDULENT_SKIP' ? styles.aiAnalysisCritical :
+                        aiValidation.analysis_category === 'LEGITIMATE_SKIP' ? styles.aiAnalysisSuccess :
+                        styles.aiAnalysisWarning
+                      }`}>
+                        <div className={styles.aiAnalysisHeader}>
+                          <Brain size={16} />
+                          <span>AI Analysis</span>
+                          {getConfidenceBadge(aiValidation.confidence)}
+                        </div>
+                        <div className={styles.aiAnalysisBody}>
+                          <p className={styles.aiVerdict}>
+                            <strong>Verdict:</strong> {aiValidation.verdict.replace(/_/g, ' ')}
+                          </p>
+                          <p className={styles.aiRecommendation}>
+                            {aiValidation.recommendation}
+                          </p>
+                        </div>
+                      </div>
+                    )}
 
                     <div className={styles.mainContentArea}>
                       {report.image_url && (
@@ -526,6 +768,11 @@ const SkiplineValidationReport = () => {
       <div className={styles.resultsCount}>
         Showing {reports.length} skipline reports
         {stats.total && ` (${stats.total} total)`}
+        {stats.ai_analysis?.fraudulent_skips > 0 && (
+          <span className={styles.fraudAlert}>
+            {' '}| 🚨 {stats.ai_analysis.fraudulent_skips} fraudulent detected
+          </span>
+        )}
       </div>
     </div>
   );
