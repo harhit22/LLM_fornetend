@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AlertTriangle, Calendar, User, Truck, Phone } from 'lucide-react';
 import styles from './DriverTripSummary.module.css';
 import { useCity } from "../../context/CityContext";
-import BASE_URL from '../../api/constent/BaseUrl';
+import BASE_URL from '../../api/constant/BaseUrl';
 const DriverTripSummary = () => {
     const { selectedCity } = useCity();
   const [reportData, setReportData] = useState([]);

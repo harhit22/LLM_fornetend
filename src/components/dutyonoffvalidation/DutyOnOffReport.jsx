@@ -19,12 +19,13 @@ import {
   Shield,
   Shirt,
   Volume2,
-  Award
+  Award,
+  RectangleHorizontal
 } from "lucide-react";
 import { useCity } from "../../context/CityContext";
 import styles from "./DutyOnOffReport.module.css";
 import { useDate } from "../../context/DateContext";
-import BASE_URL from '../../api/constent/BaseUrl';
+import BASE_URL from '../../api/constant/BaseUrl';
 
 const DutyOnOffReport = () => {
   const { selectedCity, setSelectedCity } = useCity();
@@ -39,30 +40,38 @@ const DutyOnOffReport = () => {
   const [zoneFilter, setZoneFilter] = useState("");
   const [driverFilter, setDriverFilter] = useState("");
   const [vehicleFilter, setVehicleFilter] = useState("");
-  const [complianceFilter, setComplianceFilter] = useState(""); // all, compliant, non-compliant
+  const [complianceFilter, setComplianceFilter] = useState("all");
+  
+  // Display filters - which compliance items to show
+  const [displayFilters, setDisplayFilters] = useState({
+    hooter: true,
+    logo: true,
+    uniform: true,
+    nagarNigam: true,
+    numberPlate: true
+  });
+  
+  // Temp display filters for UI
+  const [tempDisplayFilters, setTempDisplayFilters] = useState({
+    hooter: true,
+    logo: true,
+    uniform: true,
+    nagarNigam: true,
+    numberPlate: true
+  });
+  
   const [showFilters, setShowFilters] = useState(false);
-  
-  // Compliance view mode: 'all' or 'non-compliant'
-  const [complianceViewMode, setComplianceViewMode] = useState('all');
-  
-  // Individual compliance filters (checkboxes)
-  const [filterHooter, setFilterHooter] = useState(false);
-  const [filterLogo, setFilterLogo] = useState(false);
-  const [filterUniform, setFilterUniform] = useState(false);
-  const [filterNagarNigam, setFilterNagarNigam] = useState(false);
-  
   const navigate = useNavigate();
 
   // Stats
   const [stats, setStats] = useState({
     total: 0,
-    compliant: 0,
-    nonCompliant: 0,
-    complianceRate: 0,
-    hooterCompliance: 0,
-    logoCompliance: 0,
-    uniformCompliance: 0,
-    nagarNigamCompliance: 0
+    compliant1: 0,
+    nonCompliant1: 0,
+    complianceRate1: 0,
+    compliant2: 0,
+    nonCompliant2: 0,
+    complianceRate2: 0
   });
 
   const location = useLocation();
@@ -71,14 +80,12 @@ const DutyOnOffReport = () => {
     try {
       setLoading(true);
       
-      // Build API URL with filters
       const params = new URLSearchParams();
       if (dateFilter) params.set("date", dateFilter);
       if (selectedCity?.city) params.set("city", selectedCity.city);
       if (zoneFilter) params.set("zone", zoneFilter);
       if (driverFilter) params.set("driver", driverFilter);
       if (vehicleFilter) params.set("vehicle", vehicleFilter);
-      if (complianceFilter) params.set("compliance", complianceFilter);
       
       const queryString = params.toString();
       const url = `${BASE_URL}/mobile-api/duty-on-off-reports/${queryString ? '?' + queryString : ''}`;
@@ -97,7 +104,8 @@ const DutyOnOffReport = () => {
 
   useEffect(() => {
     fetchDutyOnOffReports();
-  }, [dateFilter, selectedCity, zoneFilter, driverFilter, vehicleFilter, complianceFilter]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dateFilter, selectedCity, zoneFilter, driverFilter, vehicleFilter, displayFilters]);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -124,6 +132,7 @@ const DutyOnOffReport = () => {
     }
 
     if (zoneFromUrl) setZoneFilter(zoneFromUrl);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.search]);
 
   const navigateWithContext = (path) => {
@@ -149,77 +158,80 @@ const DutyOnOffReport = () => {
     setZoneFilter("");
     setDriverFilter("");
     setVehicleFilter("");
-    setComplianceFilter("");
-    setComplianceViewMode('all');
-    setFilterHooter(false);
-    setFilterLogo(false);
-    setFilterUniform(false);
-    setFilterNagarNigam(false);
+    setComplianceFilter("all");
+    setTempDisplayFilters({
+      hooter: true,
+      logo: true,
+      uniform: true,
+      nagarNigam: true,
+      numberPlate: true
+    });
   };
 
-  const isFullyCompliant = (report) => {
-    return report.hooter && report.logo && report.proper_uniform && report.nagar_nigam;
+  const applyDisplayFilters = () => {
+    setDisplayFilters(tempDisplayFilters);
   };
 
-  const getComplianceCount = (report) => {
+  const hasActiveDisplayFilters = () => {
+    return Object.values(tempDisplayFilters).some(val => val);
+  };
+
+  const toggleDisplayFilter = (filterName) => {
+    setTempDisplayFilters(prev => ({
+      ...prev,
+      [filterName]: !prev[filterName]
+    }));
+  };
+
+  const isFullyCompliant1 = (report) => {
+    let checks = [];
+    if (displayFilters.hooter) checks.push(report.hooter_1);
+    if (displayFilters.logo) checks.push(report.logo_1);
+    if (displayFilters.uniform) checks.push(report.proper_uniform_1);
+    if (displayFilters.nagarNigam) checks.push(report.nagar_nigam_1);
+    if (displayFilters.numberPlate) checks.push(report.number_plate_1);
+    
+    return checks.length > 0 && checks.every(check => check);
+  };
+
+  const isFullyCompliant2 = (report) => {
+    let checks = [];
+    if (displayFilters.hooter) checks.push(report.hooter_2);
+    if (displayFilters.logo) checks.push(report.logo_2);
+    if (displayFilters.uniform) checks.push(report.proper_uniform_2);
+    if (displayFilters.nagarNigam) checks.push(report.nagar_nigam_2);
+    if (displayFilters.numberPlate) checks.push(report.number_plate_2);
+    
+    return checks.length > 0 && checks.every(check => check);
+  };
+
+  const getComplianceCount1 = (report) => {
     let count = 0;
-    if (report.hooter) count++;
-    if (report.logo) count++;
-    if (report.proper_uniform) count++;
-    if (report.nagar_nigam) count++;
+    if (displayFilters.hooter && report.hooter_1) count++;
+    if (displayFilters.logo && report.logo_1) count++;
+    if (displayFilters.uniform && report.proper_uniform_1) count++;
+    if (displayFilters.nagarNigam && report.nagar_nigam_1) count++;
+    if (displayFilters.numberPlate && report.number_plate_1) count++;
     return count;
   };
 
-  const getComplianceClass = (report) => {
-    const compliant = isFullyCompliant(report);
-    return compliant ? styles.compliant : styles.nonCompliant;
+  const getComplianceCount2 = (report) => {
+    let count = 0;
+    if (displayFilters.hooter && report.hooter_2) count++;
+    if (displayFilters.logo && report.logo_2) count++;
+    if (displayFilters.uniform && report.proper_uniform_2) count++;
+    if (displayFilters.nagarNigam && report.nagar_nigam_2) count++;
+    if (displayFilters.numberPlate && report.number_plate_2) count++;
+    return count;
   };
 
-  // Filter reports based on compliance settings
-  const filteredReports = reports.filter(report => {
-    // Check if any specific compliance checkbox is selected
-    const hasSpecificFilters = filterHooter || filterLogo || filterUniform || filterNagarNigam;
+  const getTotalDisplayFilters = () => {
+    return Object.values(displayFilters).filter(val => val).length;
+  };
 
-    if (hasSpecificFilters) {
-      // If specific filters are selected, check each one
-      let matchesFilters = true;
-
-      if (filterHooter) {
-        if (complianceViewMode === 'non-compliant') {
-          // Show only non-compliant hooter
-          matchesFilters = matchesFilters && !report.hooter;
-        }
-        // If 'all' mode, hooter checkbox means "show all hooter records" (both true and false)
-        // So no additional filtering needed for 'all' mode
-      }
-
-      if (filterLogo) {
-        if (complianceViewMode === 'non-compliant') {
-          matchesFilters = matchesFilters && !report.logo;
-        }
-      }
-
-      if (filterUniform) {
-        if (complianceViewMode === 'non-compliant') {
-          matchesFilters = matchesFilters && !report.proper_uniform;
-        }
-      }
-
-      if (filterNagarNigam) {
-        if (complianceViewMode === 'non-compliant') {
-          matchesFilters = matchesFilters && !report.nagar_nigam;
-        }
-      }
-
-      return matchesFilters;
-    } else {
-      // No specific filters selected, apply general compliance view mode
-      if (complianceViewMode === 'non-compliant') {
-        return !isFullyCompliant(report);
-      }
-      return true; // Show all for 'all' mode
-    }
-  });
+  const getComplianceClass = (isCompliant) => {
+    return isCompliant ? styles.compliant : styles.nonCompliant;
+  };
 
   if (loading) {
     return (
@@ -248,7 +260,6 @@ const DutyOnOffReport = () => {
 
   return (
     <div className={styles.container}>
-      {/* Header with Navigation */}
       <div className={styles.header}>
         <div className={styles.headerContent}>
           <div className={styles.headerLeft}>
@@ -269,7 +280,6 @@ const DutyOnOffReport = () => {
           </div>
           
           <div className={styles.headerActions}>
-            {/* Mobile Menu Button */}
             <button
               onClick={() => setShowNavMenu(!showNavMenu)}
               className={styles.mobileMenuButton}
@@ -286,11 +296,10 @@ const DutyOnOffReport = () => {
           </div>
         </div>
 
-        {/* Mobile Navigation Menu */}
         {showNavMenu && (
           <div className={styles.mobileNavMenu}>
             <button
-              onClick={() => navigateWithContext('/duty-summary')}
+              onClick={() => navigateWithContext('/skipline-summary')}
               className={styles.mobileNavItem}
             >
               <Shield size={18} />
@@ -300,23 +309,29 @@ const DutyOnOffReport = () => {
         )}
       </div>
 
-      {/* Statistics Bar */}
       <div className={styles.statsBar}>
         <div className={styles.statCard}>
           <div className={styles.statValue}>{stats.total || 0}</div>
           <div className={styles.statLabel}>Total Reports</div>
         </div>
         <div className={styles.statCard}>
-          <div className={styles.statValue}>{stats.compliant || 0}</div>
-          <div className={styles.statLabel}>Fully Compliant</div>
+          <div className={styles.statValue}>{stats.compliant1 || 0}</div>
+          <div className={styles.statLabel}>Duty In Compliant</div>
         </div>
         <div className={styles.statCard}>
-          <div className={styles.statValue}>{stats.complianceRate || 0}%</div>
-          <div className={styles.statLabel}>Compliance Rate</div>
+          <div className={styles.statValue}>{stats.complianceRate1 || 0}%</div>
+          <div className={styles.statLabel}>Duty In Rate</div>
+        </div>
+        <div className={styles.statCard}>
+          <div className={styles.statValue}>{stats.compliant2 || 0}</div>
+          <div className={styles.statLabel}>Duty Out Compliant</div>
+        </div>
+        <div className={styles.statCard}>
+          <div className={styles.statValue}>{stats.complianceRate2 || 0}%</div>
+          <div className={styles.statLabel}>Duty Out Rate</div>
         </div>
       </div>
 
-      {/* Filters */}
       {showFilters && (
         <div className={styles.filtersSection}>
           <div className={styles.filtersContent}>
@@ -374,96 +389,94 @@ const DutyOnOffReport = () => {
               </div>
               <div className={styles.filterGroup}>
                 <label className={styles.filterLabel}>
-                  <Shield size={16} />
+                  <CheckCircle size={16} />
                   Compliance
                 </label>
                 <select
                   value={complianceFilter}
                   onChange={(e) => setComplianceFilter(e.target.value)}
-                  className={styles.filterInput}
+                  className={styles.filterSelect}
                 >
-                  <option value="">All</option>
-                  <option value="compliant">Fully Compliant</option>
+                  <option value="all">All</option>
+                  <option value="compliant">Compliant</option>
                   <option value="non-compliant">Non-Compliant</option>
                 </select>
               </div>
             </div>
 
-            {/* Quick Compliance Filters */}
-            <div className={styles.quickFiltersSection}>
-              <div className={styles.quickFiltersHeader}>
-                <span className={styles.quickFiltersTitle}>Compliance View Mode:</span>
-                <div className={styles.viewModeToggle}>
-                  <label className={styles.radioLabel}>
-                    <input
-                      type="radio"
-                      name="complianceViewMode"
-                      value="all"
-                      checked={complianceViewMode === 'all'}
-                      onChange={(e) => setComplianceViewMode(e.target.value)}
-                      className={styles.radioInput}
-                    />
-                    <span>All</span>
-                  </label>
-                  <label className={styles.radioLabel}>
-                    <input
-                      type="radio"
-                      name="complianceViewMode"
-                      value="non-compliant"
-                      checked={complianceViewMode === 'non-compliant'}
-                      onChange={(e) => setComplianceViewMode(e.target.value)}
-                      className={styles.radioInput}
-                    />
-                    <span>Non-Compliant Only</span>
-                  </label>
-                </div>
+            {/* Display Filters - Select which compliance items to show */}
+            <div className={styles.complianceFiltersSection}>
+              <div className={styles.complianceFiltersTitle}>
+                <Eye size={16} />
+                <span>Select Compliance Items to Display</span>
               </div>
-              
-              <div className={styles.complianceFilters}>
-                <label className={styles.checkboxLabel}>
+              <div className={styles.displayFiltersGrid}>
+                <label className={styles.displayFilterLabel}>
                   <input
                     type="checkbox"
-                    checked={filterHooter}
-                    onChange={(e) => setFilterHooter(e.target.checked)}
-                    className={styles.checkboxInput}
+                    checked={tempDisplayFilters.hooter}
+                    onChange={() => toggleDisplayFilter('hooter')}
+                    className={styles.filterCheckbox}
                   />
                   <Volume2 size={16} />
                   <span>Hooter</span>
                 </label>
-
-                <label className={styles.checkboxLabel}>
+                
+                <label className={styles.displayFilterLabel}>
                   <input
                     type="checkbox"
-                    checked={filterLogo}
-                    onChange={(e) => setFilterLogo(e.target.checked)}
-                    className={styles.checkboxInput}
+                    checked={tempDisplayFilters.logo}
+                    onChange={() => toggleDisplayFilter('logo')}
+                    className={styles.filterCheckbox}
                   />
                   <Award size={16} />
                   <span>Logo</span>
                 </label>
-
-                <label className={styles.checkboxLabel}>
+                
+                <label className={styles.displayFilterLabel}>
                   <input
                     type="checkbox"
-                    checked={filterUniform}
-                    onChange={(e) => setFilterUniform(e.target.checked)}
-                    className={styles.checkboxInput}
+                    checked={tempDisplayFilters.uniform}
+                    onChange={() => toggleDisplayFilter('uniform')}
+                    className={styles.filterCheckbox}
                   />
                   <Shirt size={16} />
                   <span>Uniform</span>
                 </label>
-
-                <label className={styles.checkboxLabel}>
+                
+                <label className={styles.displayFilterLabel}>
                   <input
                     type="checkbox"
-                    checked={filterNagarNigam}
-                    onChange={(e) => setFilterNagarNigam(e.target.checked)}
-                    className={styles.checkboxInput}
+                    checked={tempDisplayFilters.nagarNigam}
+                    onChange={() => toggleDisplayFilter('nagarNigam')}
+                    className={styles.filterCheckbox}
                   />
                   <Shield size={16} />
                   <span>Nagar Nigam</span>
                 </label>
+
+                <label className={styles.displayFilterLabel}>
+                  <input
+                    type="checkbox"
+                    checked={tempDisplayFilters.numberPlate}
+                    onChange={() => toggleDisplayFilter('numberPlate')}
+                    className={styles.filterCheckbox}
+                  />
+                  <RectangleHorizontal size={16} />
+                  <span>Number Plate</span>
+                </label>
               </div>
+            </div>
+              
+            <div className={styles.complianceSubmitContainer}>
+              <button 
+                onClick={applyDisplayFilters} 
+                className={styles.applyFiltersButton}
+                disabled={!hasActiveDisplayFilters()}
+              >
+                <Filter size={16} />
+                Apply Display Filters
+              </button>
             </div>
 
             <div className={styles.filtersBottom}>
@@ -477,25 +490,29 @@ const DutyOnOffReport = () => {
 
       {/* Reports List */}
       <div className={styles.reportsSection}>
-        {filteredReports.length === 0 ? (
+        {reports.length === 0 ? (
           <div className={styles.emptyState}>
             <Shield className={styles.emptyStateIcon} size={48} />
-            <p className={styles.emptyStateText}>
-              {reports.length === 0 
-                ? "No duty on/off reports found"
-                : "No reports match the selected filters"}
-            </p>
+            <p className={styles.emptyStateText}>No duty on/off reports found</p>
           </div>
         ) : (
           <div className={styles.reportsList}>
-            {filteredReports.map((report, index) => {
-              const fullyCompliant = isFullyCompliant(report);
-              const complianceCount = getComplianceCount(report);
+            {reports.map((report, index) => {
+              const fullyCompliant1 = isFullyCompliant1(report);
+              const fullyCompliant2 = isFullyCompliant2(report);
+              const complianceCount1 = getComplianceCount1(report);
+              const complianceCount2 = getComplianceCount2(report);
+              const totalFilters = getTotalDisplayFilters();
+
+              // Apply compliance filter
+              const isCompliant = fullyCompliant1 && fullyCompliant2;
+              if (complianceFilter === "compliant" && !isCompliant) return null;
+              if (complianceFilter === "non-compliant" && isCompliant) return null;
 
               return (
                 <div
                   key={index}
-                  className={`${styles.reportCard} ${getComplianceClass(report)}`}
+                  className={styles.reportCard}
                 >
                   <div className={styles.reportHeader}>
                     <div className={styles.reportHeaderContent}>
@@ -508,16 +525,6 @@ const DutyOnOffReport = () => {
                           <MapPin size={14} />
                           {report.city} | {new Date(report.date).toLocaleDateString()}
                         </p>
-                      </div>
-                      <div className={styles.complianceIndicator}>
-                        {fullyCompliant ? (
-                          <CheckCircle size={20} className={styles.compliantIcon} />
-                        ) : (
-                          <XCircle size={20} className={styles.nonCompliantIcon} />
-                        )}
-                        <span className={styles.complianceText}>
-                          {complianceCount}/4 Items
-                        </span>
                       </div>
                     </div>
                   </div>
@@ -574,52 +581,147 @@ const DutyOnOffReport = () => {
                       <span>{report.vehicle_number || "N/A"}</span>
                     </div>
 
-                    {/* Compliance Icons - 4 in a row */}
-                    <div className={styles.complianceIcons}>
-                      <div className={`${styles.iconItem} ${report.hooter ? styles.iconActive : styles.iconInactive}`}>
-                        <Volume2 size={24} />
-                        <span>Hooter</span>
-                      </div>
-                      <div className={`${styles.iconItem} ${report.logo ? styles.iconActive : styles.iconInactive}`}>
-                        <Award size={24} />
-                        <span>Logo</span>
-                      </div>
-                      <div className={`${styles.iconItem} ${report.proper_uniform ? styles.iconActive : styles.iconInactive}`}>
-                        <Shirt size={24} />
-                        <span>Uniform</span>
-                      </div>
-                      <div className={`${styles.iconItem} ${report.nagar_nigam ? styles.iconActive : styles.iconInactive}`}>
-                        <Shield size={24} />
-                        <span>Nagar Nigam</span>
-                      </div>
-                    </div>
-
-                    {/* Image Section */}
-                    {report.image_url && (
-                      <div className={styles.imageSection}>
+                    {/* Dual Image Section with Compliance Icons */}
+                    <div className={styles.dualImageSection}>
+                      {/* Duty In Section */}
+                      <div className={styles.imageColumn}>
                         <div className={styles.imageLabelContainer}>
-                          <span className={styles.imageLabel}>Fuel Slip Image</span>
+                          <span className={styles.imageLabel}>Duty In</span>
+                          <div className={`${styles.complianceIndicator} ${getComplianceClass(fullyCompliant1)}`}>
+                            {fullyCompliant1 ? (
+                              <CheckCircle size={16} className={styles.compliantIcon} />
+                            ) : (
+                              <XCircle size={16} className={styles.nonCompliantIcon} />
+                            )}
+                            <span className={styles.complianceText}>
+                              {complianceCount1}/{totalFilters}
+                            </span>
+                          </div>
                         </div>
-                        <img
-                          src={report.image_url}
-                          alt="Duty Evidence"
-                          className={styles.evidenceImage}
-                          onError={(e) => {
-                            e.target.src = "/api/placeholder/400/300";
-                            e.target.className = `${styles.evidenceImage} ${styles.imageError}`;
-                          }}
-                          onClick={() => window.open(report.image_url, '_blank')}
-                        />
-                      </div>
-                    )}
+                        
+                        {/* Compliance Icons for Duty In */}
+                        <div className={styles.complianceItemsRow}>
+                          {displayFilters.hooter && (
+                            <div className={`${styles.complianceItem} ${report.hooter_1 ? styles.itemActive : styles.itemInactive}`}>
+                              <Volume2 size={16} />
+                              <span>Hooter</span>
+                            </div>
+                          )}
+                          {displayFilters.logo && (
+                            <div className={`${styles.complianceItem} ${report.logo_1 ? styles.itemActive : styles.itemInactive}`}>
+                              <Award size={16} />
+                              <span>Logo</span>
+                            </div>
+                          )}
+                          {displayFilters.uniform && (
+                            <div className={`${styles.complianceItem} ${report.proper_uniform_1 ? styles.itemActive : styles.itemInactive}`}>
+                              <Shirt size={16} />
+                              <span>Uniform</span>
+                            </div>
+                          )}
+                          {displayFilters.nagarNigam && (
+                            <div className={`${styles.complianceItem} ${report.nagar_nigam_1 ? styles.itemActive : styles.itemInactive}`}>
+                              <Shield size={16} />
+                              <span>Nagar Nigam</span>
+                            </div>
+                          )}
+                          {displayFilters.numberPlate && (
+                            <div className={`${styles.complianceItem} ${report.number_plate_1 ? styles.itemActive : styles.itemInactive}`}>
+                              <RectangleHorizontal size={16} />
+                              <span>Number Plate</span>
+                            </div>
+                          )}
+                        </div>
 
-                    {/* Status Message */}
-                    <div className={`${styles.statusMessage} ${getComplianceClass(report)}`}>
-                      {fullyCompliant ? (
-                        <span>✅ All compliance requirements met</span>
-                      ) : (
-                        <span>⚠️ Compliance requirements not fully met ({complianceCount}/4)</span>
-                      )}
+                        {/* Image for Duty In */}
+                        {report.image_url_1 ? (
+                          <img
+                            src={report.image_url_1}
+                            alt="Duty In Evidence"
+                            className={styles.evidenceImage}
+                            onError={(e) => {
+                              e.target.src = "/api/placeholder/400/300";
+                              e.target.className = `${styles.evidenceImage} ${styles.imageError}`;
+                            }}
+                            onClick={() => window.open(report.image_url_1, '_blank')}
+                          />
+                        ) : (
+                          <div className={styles.noImagePlaceholder}>
+                            <Eye size={32} />
+                            <span>No image available</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Duty Out Section */}
+                      <div className={styles.imageColumn}>
+                        <div className={styles.imageLabelContainer}>
+                          <span className={styles.imageLabel}>Duty Out</span>
+                          <div className={`${styles.complianceIndicator} ${getComplianceClass(fullyCompliant2)}`}>
+                            {fullyCompliant2 ? (
+                              <CheckCircle size={16} className={styles.compliantIcon} />
+                            ) : (
+                              <XCircle size={16} className={styles.nonCompliantIcon} />
+                            )}
+                            <span className={styles.complianceText}>
+                              {complianceCount2}/{totalFilters}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        {/* Compliance Icons for Duty Out */}
+                        <div className={styles.complianceItemsRow}>
+                          {displayFilters.hooter && (
+                            <div className={`${styles.complianceItem} ${report.hooter_2 ? styles.itemActive : styles.itemInactive}`}>
+                              <Volume2 size={16} />
+                              <span>Hooter</span>
+                            </div>
+                          )}
+                          {displayFilters.logo && (
+                            <div className={`${styles.complianceItem} ${report.logo_2 ? styles.itemActive : styles.itemInactive}`}>
+                              <Award size={16} />
+                              <span>Logo</span>
+                            </div>
+                          )}
+                          {displayFilters.uniform && (
+                            <div className={`${styles.complianceItem} ${report.proper_uniform_2 ? styles.itemActive : styles.itemInactive}`}>
+                              <Shirt size={16} />
+                              <span>Uniform</span>
+                            </div>
+                          )}
+                          {displayFilters.nagarNigam && (
+                            <div className={`${styles.complianceItem} ${report.nagar_nigam_2 ? styles.itemActive : styles.itemInactive}`}>
+                              <Shield size={16} />
+                              <span>Nagar Nigam</span>
+                            </div>
+                          )}
+                          {displayFilters.numberPlate && (
+                            <div className={`${styles.complianceItem} ${report.number_plate_2 ? styles.itemActive : styles.itemInactive}`}>
+                              <RectangleHorizontal size={16} />
+                              <span>Number Plate</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Image for Duty Out */}
+                        {report.image_url_2 ? (
+                          <img
+                            src={report.image_url_2}
+                            alt="Duty Out Evidence"
+                            className={styles.evidenceImage}
+                            onError={(e) => {
+                              e.target.src = "/api/placeholder/400/300";
+                              e.target.className = `${styles.evidenceImage} ${styles.imageError}`;
+                            }}
+                            onClick={() => window.open(report.image_url_2, '_blank')}
+                          />
+                        ) : (
+                          <div className={styles.noImagePlaceholder}>
+                            <Eye size={32} />
+                            <span>No image available</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -630,9 +732,8 @@ const DutyOnOffReport = () => {
       </div>
 
       <div className={styles.resultsCount}>
-        Showing {filteredReports.length} duty on/off reports
-        {reports.length !== filteredReports.length && ` (${reports.length} total)`}
-        {stats.total && ` | ${stats.total} in database`}
+        Showing {reports.length} duty on/off reports
+        {stats.total && ` (${stats.total} total)`}
       </div>
     </div>
   );

@@ -1,0 +1,464 @@
+/* Date Filter Styles */
+.dateFilterWrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.dateInputContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.dateInputContainer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
+  pointer-events: none;
+}
+
+.dateInputContainer:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.dateInputContainer:active {
+  transform: translateY(0);
+}
+
+/* Date Input Row */
+.dateInputContainer > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.calendarIcon {
+  color: #ffffff;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  flex-shrink: 0;
+}
+
+.dateInput {
+  border: none;
+  background: rgba(255, 255, 255, 0.95);
+  font-size: 14px;
+  font-weight: 500;
+  color: #2d3748;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  min-width: 150px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.dateInput:hover {
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.dateInput:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+/* Calendar icon styling for webkit browsers */
+.dateInput::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(0.5);
+  transition: filter 0.2s ease;
+}
+
+.dateInput::-webkit-calendar-picker-indicator:hover {
+  filter: invert(0.3);
+}
+
+/* Quick Date Buttons */
+.quickDateButtons {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+}
+
+.quickDateBtn {
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+  white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.quickDateBtn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.quickDateBtn:active {
+  transform: translateY(0);
+}
+
+.quickDateBtnActive {
+  background: rgba(255, 255, 255, 0.95);
+  color: #667eea;
+  border-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.3);
+  font-weight: 700;
+}
+
+.quickDateBtnActive:hover {
+  background: rgba(255, 255, 255, 1);
+  color: #667eea;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .dateInputContainer {
+    padding: 8px 12px;
+  }
+
+  .dateInput {
+    min-width: 130px;
+    font-size: 13px;
+    padding: 6px 10px;
+  }
+
+  .quickDateButtons {
+    gap: 4px;
+  }
+
+  .quickDateBtn {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+
+  .calendarIcon {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dateInputContainer {
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .dateInput {
+    min-width: 110px;
+  }
+
+  .quickDateButtons {
+    flex-direction: row;
+  }
+}
+
+/* Animation for date change */
+@keyframes dateChange {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.dateInput:focus {
+  animation: dateChange 0.3s ease;
+}
+
+/* Existing header styles (add these to your existing CSS) */
+.header {
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.backButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: #f7fafc;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #4a5568;
+}
+
+.backButton:hover {
+  background: #edf2f7;
+  color: #2d3748;
+  transform: translateX(-2px);
+}
+
+.headerTitle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #2d3748;
+  margin: 0;
+}
+
+.reportIcon {
+  font-size: 24px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.reportName {
+  text-transform: capitalize;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Dropdown Styles */
+.dropdownWrapper {
+  position: relative;
+}
+
+.dropdownButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  font-weight: 500;
+  color: #4a5568;
+}
+
+.dropdownButton:hover {
+  background: #edf2f7;
+  border-color: #cbd5e0;
+}
+
+.dropdownButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.dropdownText {
+  white-space: nowrap;
+}
+
+.chevron {
+  transition: transform 0.2s ease;
+}
+
+.chevronUp {
+  transform: rotate(180deg);
+}
+
+.dropdownOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  min-width: 220px;
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 1000;
+  animation: dropdownSlideIn 0.2s ease;
+}
+
+@keyframes dropdownSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  color: #4a5568;
+  font-size: 14px;
+}
+
+.dropdownItem:hover {
+  background: #f7fafc;
+}
+
+.dropdownItemActive {
+  background: #edf7ff;
+  color: #667eea;
+  font-weight: 600;
+}
+
+.itemIcon {
+  font-size: 18px;
+}
+
+.itemName {
+  flex: 1;
+}
+
+.checkmark {
+  color: #48bb78;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+/* Action Buttons */
+.actionButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  font-weight: 500;
+  color: #4a5568;
+}
+
+.actionButton:hover {
+  background: #edf2f7;
+  border-color: #cbd5e0;
+}
+
+.actionButtonActive {
+  background: #667eea;
+  border-color: #667eea;
+  color: #ffffff;
+}
+
+.actionButtonActive:hover {
+  background: #5568d3;
+  border-color: #5568d3;
+}
+
+.actionButtonText {
+  font-weight: 600;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .headerContent {
+    padding: 12px 16px;
+  }
+
+  .headerActions {
+    gap: 8px;
+  }
+
+  .dropdownButton,
+  .actionButton {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 768px) {
+  .headerContent {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .headerLeft {
+    width: 100%;
+  }
+
+  .headerActions {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .headerActions::-webkit-scrollbar {
+    display: none;
+  }
+
+  .dropdownText {
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .actionButtonText {
+    display: none;
+  }
+}

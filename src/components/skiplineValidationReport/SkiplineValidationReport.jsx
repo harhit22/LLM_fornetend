@@ -31,7 +31,7 @@ import {
 import { useCity } from "../../context/CityContext";
 import styles from "./SkiplineValidationReport.module.css";
 import { useDate } from "../../context/DateContext";
-import BASE_URL from '../../api/constent/BaseUrl';
+import BASE_URL from '../../api/constant/BaseUrl';
 
 const SkiplineValidationReport = () => {
   const { selectedCity, setSelectedCity } = useCity();

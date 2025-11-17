@@ -13,7 +13,7 @@ import {
   BadgeCheck,
 } from "lucide-react";
 import styles from "./TransportExecutiveLoginValidation.module.css";
-import BASE_URL from '../../api/constent/BaseUrl';
+import BASE_URL from '../../api/constant/BaseUrl';
 
 const TransportExecutiveLoginValidation = () => {
   const [reports, setReports] = useState([]);

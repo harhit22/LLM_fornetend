@@ -23,7 +23,7 @@ import {
 import { useCity } from "../../context/CityContext";
 import { useDate } from "../../context/DateContext";
 import styles from "./FuelValidationReport.module.css";
-import BASE_URL from '../../api/constent/BaseUrl';
+import BASE_URL from '../../api/constant/BaseUrl';
 const FuelValidationReport = () => {
   const { selectedCity, setSelectedCity } = useCity();
   const { selectedDate, setSelectedDate, dateRange, setDateRange } = useDate();

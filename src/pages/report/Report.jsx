@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import styles from './Report.module.css';
 import { useNavigate } from "react-router-dom"; 
-import BASE_URL from '../../api/constent/BaseUrl';
+import BASE_URL from '../../api/constant/BaseUrl';
+
 const Report = () => {
   const [reportTypes, setReportTypes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -36,7 +37,6 @@ const Report = () => {
 
   // Function to determine the route based on report type
   const getReportRoute = (report) => {
-    // You can use report.id, report.name, or any unique identifier
     switch(report.name.toLowerCase()) {
       case 'trip validation report':
         return '/trip-validation-report';
@@ -46,18 +46,23 @@ const Report = () => {
         return '/skipline-validation-report';
       case 'employee sop report':
         return '/transport-executive-login-validation';
-        case 'employee sop report':
-        return '/transport-executive-login-validation';
       case 'duty on off report':
         return '/DutyOnOffReport';
+      case 'dustbin validation report':
+        return '/dustbin-report';
+      
       default:
-        return '/details'; // fallback route
+        return '/details';
     }
   };
 
   const handleReportClick = (report) => {
     const route = getReportRoute(report);
     navigate(route);
+  };
+
+  const handleBack = () => {
+    navigate('/'); // Go back to previous page
   };
 
   if (loading) {
@@ -74,6 +79,9 @@ const Report = () => {
   if (error) {
     return (
       <div className={styles.container}>
+        <button onClick={handleBack} className={styles.backButton}>
+          <span className={styles.backArrow}>←</span> Back
+        </button>
         <div className={styles.error}>
           <h3>Error Loading Reports</h3>
           <p>{error}</p>
@@ -87,6 +95,10 @@ const Report = () => {
 
   return (
     <div className={styles.container}>
+      <button onClick={handleBack} className={styles.backButton}>
+        <span className={styles.backArrow}>←</span> Back
+      </button>
+
       <div className={styles.header}>
         <h1>📊 Report Selection</h1>
         <p>Choose a report type to view</p>

@@ -14,7 +14,7 @@ import {
 import { useCity } from "../../context/CityContext";
 import styles from "./TripValidationReport.module.css";
 import { Navigate } from "react-router-dom";
-import BASE_URL from '../../api/constent/BaseUrl';
+import BASE_URL from '../../api/constant/BaseUrl';
 
 const TripValidationReport = () => {
   const { selectedCity } = useCity();

@@ -1,4 +1,4 @@
-import BASE_URL from "../constent/BaseUrl";
+import BASE_URL from "../constant/BaseUrl";
 export async function fetchCities() {
   try {
     const response = await fetch(`${BASE_URL}/mobile-api/cities`);

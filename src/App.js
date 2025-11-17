@@ -3,13 +3,14 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { CityProvider } from "./context/CityContext";
 import Home from "./pages/home/Home";
 import Report from "./pages/report/Report";
-import TripValidationReport from "./components/tripValidationReport/TripValidationReport ";
-import DriverTripSummary from "./components/driverTripSummery/DriverTripSummary ";
+import TripValidationReport from "./components/tripValidationReport/TripValidationReport";
+import DriverTripSummary from "./components/driverTripSummery/DriverTripSummary";
 import FuelValidationReport from "./components/fuelValidationReport/FuelValidationReport"
 import SkiplineValidationReport from "./components/skiplineValidationReport/SkiplineValidationReport";
 import TransportExecutiveLoginValidation from "./components/TransportExecutiveLoginValidation/TransportExecutiveLoginValidation";
 import { DateProvider } from "./context/DateContext";
 import DutyOnOffReport from "./components/dutyonoffvalidation/DutyOnOffReport";
+import DustbinValidationReport from "./components/dustbinvalidation/DustbinValidationReport";
 function App() {
   return (
     <CityProvider>
@@ -24,6 +25,7 @@ function App() {
             <Route path="/skipline-validation-report" element={<SkiplineValidationReport />} />
             <Route path="/transport-executive-login-validation" element={<TransportExecutiveLoginValidation />} />
             <Route path="/DutyOnOffReport" element={<DutyOnOffReport />} />
+            <Route path="/dustbin-report" element={<DustbinValidationReport />} />
           
         </Routes>
       </Router>
